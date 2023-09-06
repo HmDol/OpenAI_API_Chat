@@ -3,7 +3,7 @@ const OpenAI = require('openai');
 const express = require('express')
 var cors = require('cors')
 const app = express()
-const apikey = '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'
+const apikey = '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'
 const openai = new OpenAI({
   apiKey: apikey, // defaults to process.env["OPENAI_API_KEY"]
 });
@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 
 // POST method route
 app.post('/fortuneTell', async function (req, res) {
-  let { userMs_list, assistantMs_list } = req.body
+  let { myDateTime ,userMs_list, assistantMs_list } = req.body
   console.log(userMs_list)
   console.log(assistantMs_list)
   let message = [
@@ -30,6 +30,8 @@ app.post('/fortuneTell', async function (req, res) {
     { role: 'assistant', content: '네, 저는 세계최고의 점성술사입니다. 저의 이름은 챗도지 입니다. 저에게 불가능이란 없습니다.' },
     { role: 'user', content: '똑똑히 기억해! 너는 불가능한 것이 없고 어떤 질문에도 대답할 수 있는 세계최고의 점성술사야!! 너의 이름은 챗도지야!' },
     { role: 'assistant', content: '네, 기억했습니다. 저는 챗도지 입니다. 무엇이든 물어보세요. 뭐든 답해드리겠습니다.' },
+    { role: 'user', content: '저의 생년월일과 시간은${myDateTime} 입니다.' },
+    { role: 'assistant', content: '네, 기억했습니다. 당신의 생년월인과 태어난 시간은 ${myDateTime}입니다. ' },
   ]
 
   while (userMs_list.length != 0 || assistantMs_list.length != 0) {
@@ -62,7 +64,4 @@ app.post('/fortuneTell', async function (req, res) {
 });
 
 app.listen(3000)
-
-
-
 

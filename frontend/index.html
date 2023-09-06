@@ -73,25 +73,33 @@
             margin-left : 100px;
         }
 
+        .intro-container{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items : center;
+        }
         #doge{
-            width: 200px;
-            height: 200px;
+            width: 30%;
+            height: 30% ;
         }
     </style>
 </head>
 
 <body>
-    <div class="intro-container">
+    
+    <div id="intro" class="intro-container">
         <h1>운세를 알려드립니다.</h1>
         <img id="doge" src="doge.jpg" alt="이미지 없어 시발">
-        <input type="date">
-        <input type="time">
+        <label for="date">생년원일 선택 <input id ="date" type="date"></label> 
+        <label for="time">태어난 시간 <input id="time" type="time"></label> 
+        <button onclick="start()">보내기</button>
     </div>
 
 
-    <div class="chat-container">
+    <div id="chat-container" class="chat-container" style="display:none">
         <h1>챗도지 시스템</h1>
-        <div class="chat-messages" id="chat-messages">
+        <div class="chat-messages" id="chat-messages" >
             <div class="message bot-message">
                 챗도지 시스템에 오신 것을 환영합니다! 운세를 보려면 'send' 버튼을 클릭하세요.
             </div>
@@ -106,6 +114,24 @@
 
     let userMs_list =[];
     let assistantMs_list = [];
+    let myDateTime = '';
+
+    function start(){
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        if(date ==''){
+            alert("생년월일을 선택해주세요");
+            return;
+        } 
+        if(time == ''){
+            alert("태어난 시간을 선택해주세요");
+            return;
+        }
+        myDateTime = date + " " + time;
+        // console.log(myDateTime);
+        document.getElementById("intro").style.display="none";
+        document.getElementById("chat-container").style.display="block";
+    }
     function addMessage(message, isUser) {
         const chatMessages = document.getElementById("chat-messages");
         const messageContainer = document.createElement("div");
@@ -131,6 +157,7 @@
                     // message,
                     userMs_list : userMs_list,
                     assistantMs_list : assistantMs_list,
+                    myDateTime : myDateTime,
                  }),
             });
 
@@ -163,6 +190,6 @@
     }
 </script>
 
-</body>
+
 
 </html>
