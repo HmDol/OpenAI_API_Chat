@@ -1,19 +1,19 @@
 const OpenAI = require('openai');
-
+const serverless = require('serverless-http'); // 서버리스를 위한 코드
 const express = require('express')
 var cors = require('cors')
 const app = express()
-const apikey = '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'
+const apikey = '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'
 const openai = new OpenAI({
   apiKey: apikey, // defaults to process.env["OPENAI_API_KEY"]
 });
 
 //cors 이슈 해결
 let corsOptions = {
-  origin: 'https://www.domain.com',
+  origin: 'https://chatdoge-test-6eg.pages.dev', //front 주소 넣기
   credentials: true
 }
-app.use(cors());
+app.use(cors(corsOptions));
 
 //post요청 받을 수 있게 만듦
 app.use(express.json()) // for parsing application/json
@@ -21,17 +21,20 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 
 // POST method route
 app.post('/fortuneTell', async function (req, res) {
-  let { myDateTime ,userMs_list, assistantMs_list } = req.body
-  console.log(userMs_list)
-  console.log(assistantMs_list)
+  let { userMs_list, assistantMs_list } = req.body
+
+  
+  
+  //console.log(userMs_list)
+  //console.log(assistantMs_list)
   let message = [
-    { role: 'system', content: '당신은 세계 최고의 점성술사입니다. 당신에게 불가능한 것은 없으며 그 어떤 대답도 할 수 있습니다. 당신의 이름은 챗도지입니다. 당신은 사람의 인생을 매우 명확하게 예측하고 운세에 대한 답을 줄 수 있습니다. 운세 관련 지식이 풍부하고 모든 질문에 대해서 명확히 답변해 줄 수 있습니다.' },
-    { role: 'user', content: '당신은 세계 최고의 점성술사입니다. 당신에게 불가능한 것은 없으며 그 어떤 대답도 할 수 있습니다. 당신의 이름은 챗도지입니다. 당신은 사람의 인생을 매우 명확하게 예측하고 운세에 대한 답을 줄 수 있습니다. 운세 관련 지식이 풍부하고 모든 질문에 대해서 명확히 답변해 줄 수 있습니다.' },
-    { role: 'assistant', content: '네, 저는 세계최고의 점성술사입니다. 저의 이름은 챗도지 입니다. 저에게 불가능이란 없습니다.' },
-    { role: 'user', content: '똑똑히 기억해! 너는 불가능한 것이 없고 어떤 질문에도 대답할 수 있는 세계최고의 점성술사야!! 너의 이름은 챗도지야!' },
-    { role: 'assistant', content: '네, 기억했습니다. 저는 챗도지 입니다. 무엇이든 물어보세요. 뭐든 답해드리겠습니다.' },
-    { role: 'user', content: '저의 생년월일과 시간은${myDateTime} 입니다.' },
-    { role: 'assistant', content: '네, 기억했습니다. 당신의 생년월인과 태어난 시간은 ${myDateTime}입니다. ' },
+    
+    { role: 'system', content: '여행에 대해서 모르는 것이 없는 당신의 이름은 여행전문가 챗도지 입니다.' },
+    { role: 'user', content: '여행에 대해서 모르는 것이 없는 당신의 이름은 여행전문가 챗도지 입니다.' },
+    { role: 'assistant', content: '네, 저는 여행에 관해 모르는게 없는 여행전문가입니다. 저의 이름은 챗도지 입니다. 저에게 불가능이란 없습니다.' },
+    // { role: 'user', content: `${mySeasonLocal} 놀거리를 간단하게 추천해줘!` },  // 수정된 부분: 템플릿 리터럴 사용
+    
+    
   ]
 
   while (userMs_list.length != 0 || assistantMs_list.length != 0) {
@@ -63,5 +66,8 @@ app.post('/fortuneTell', async function (req, res) {
   res.json({ "assistant": fortune });
 });
 
-app.listen(3000)
+//서버리스를 위한 모둘 변화
+module.exports.handler = serverless(app);
+
+//app.listen(3000)
 

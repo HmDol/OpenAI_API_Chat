@@ -6,6 +6,8 @@
     <link rel="icon" href="sample.jpg" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <title>운세보는 챗도지</title>
     <style>
         body {
@@ -35,7 +37,7 @@
         }
 
         .message {
-            font-size : 15px;
+            font-size : 12px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -70,6 +72,7 @@
         }
 
         .user-message{
+            font-size : 12px;
             margin-left : 100px;
         }
 
@@ -88,108 +91,132 @@
 
 <body>
     
-    <div id="intro" class="intro-container">
-        <h1>운세를 알려드립니다.</h1>
-        <img id="doge" src="doge.jpg" alt="이미지 없어 시발">
-        <label for="date">생년원일 선택 <input id ="date" type="date"></label> 
-        <label for="time">태어난 시간 <input id="time" type="time"></label> 
-        <button onclick="start()">보내기</button>
+    <div id="intro" class="intro-container text-center">
+        <h1>어떤 여행이 궁금 하나요??</h1>
+        <img id="doge" src="trip_siba.png" alt="이미지 없음">
+        <!-- <label class="fs-5" for="date">계절을 선택해주세요 <br>
+            <input type="radio" class="btn-check" name="season" id="spring_btn" value="봄" autocomplete="off">
+            <label class="btn btn-outline-primary" for="spring_btn">봄</label>
+            <input type="radio" class="btn-check" name="season" id="summer_btn" value="여름" autocomplete="off">
+            <label class="btn btn-outline-primary" for="summer_btn">여름</label>
+            <input type="radio" class="btn-check" name="season" id="fall_btn" value="가을" autocomplete="off">
+            <label class="btn btn-outline-primary" for="fall_btn">가을</label>
+            <input type="radio" class="btn-check" name="season" id="winter_btn" value="겨울" autocomplete="off">
+            <label class="btn btn-outline-primary" for="winter_btn">겨울</label><br>
+        </label>
+        <label class="fs-5"for="time">지역 <input id="local" type="text"></label> -->
+        <br>
+        <button onclick="start()">시작하기</button>
     </div>
-
+    
+    
+    
 
     <div id="chat-container" class="chat-container" style="display:none">
         <h1>챗도지 시스템</h1>
         <div class="chat-messages" id="chat-messages" >
             <div class="message bot-message">
-                챗도지 시스템에 오신 것을 환영합니다! 운세를 보려면 'send' 버튼을 클릭하세요.
+                안녕하세요! 여행전문가 챗도지입니다. 무엇이든 물어보세요!
             </div>
+            
+        </div>
+        <br>
+        <div id="loading-screen" style="display: none; text-align:center" >
+            <i class="fas fa-spinner fa-spin"></i> Loading...
         </div>
         <input onkeyup="if(window.event.keyCode==13){sendMessage()}"type="text" id="user-input" placeholder="메시지를 입력하세요...">
-        <button onclick="sendMessage()">Send</button>
+        <button id="loadButton" onclick="sendMessage(); ">Send</button>
+
+        
     </div>
 
    <!-- Add this script section before your previous script section -->
-<script>
-    // Function to add a message to the chat UI
-
-    let userMs_list =[];
-    let assistantMs_list = [];
-    let myDateTime = '';
-
-    function start(){
-        const date = document.getElementById('date').value;
-        const time = document.getElementById('time').value;
-        if(date ==''){
-            alert("생년월일을 선택해주세요");
-            return;
-        } 
-        if(time == ''){
-            alert("태어난 시간을 선택해주세요");
-            return;
+    <script>
+        let userMs_list =[];
+        let assistantMs_list = [];
+        
+        function start(){
+            // var season = document.getElementsByName('season');
+            // var selectedseason;
+            // for (var i = 0; i < season.length; i++) {
+            //     if (season[i].checked) {
+            //         selectedseason = season[i].value;
+            //         break;
+            //     }
+            // }
+            // const local = document.getElementById('local').value;
+            // if(selectedseason ==''){
+            //     alert("계절을 선택해주세요!");
+            //     return;
+            // } 
+            // if(local == ''){
+            //     alert("지역을 입력해주세요!");
+            //     return;
+            // }
+            // mySeasonLocal = selectedseason + " " + local;
+            // console.log(mySeasonLocal);
+            document.getElementById("intro").style.display="none";
+            document.getElementById("chat-container").style.display="block";
         }
-        myDateTime = date + " " + time;
-        // console.log(myDateTime);
-        document.getElementById("intro").style.display="none";
-        document.getElementById("chat-container").style.display="block";
-    }
-    function addMessage(message, isUser) {
-        const chatMessages = document.getElementById("chat-messages");
-        const messageContainer = document.createElement("div");
-        // console.log(messageContainer + '1');
-        messageContainer.classList.add("message");
-        messageContainer.classList.add(isUser ? "user-message" : "bot-message");
-        // console.log(messageContainer.classList +'2');
-        messageContainer.textContent = message;
-        // console.log(messageContainer.textContent);
-        chatMessages.appendChild(messageContainer);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the latest message
-    }
-
-    // Function to send a message to the server
-    async function sendMessageToServer(message) {
-        try {
-            const response = await fetch('http://localhost:3000/fortuneTell', { // Replace with your server's URL
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ 
-                    // message,
-                    userMs_list : userMs_list,
-                    assistantMs_list : assistantMs_list,
-                    myDateTime : myDateTime,
-                 }),
-            });
-
-            const data = await response.json();
-            console.log(data);
-            return data.assistant;
-        } catch (error) {
-            console.error(error);
-            return "운세를 가져오는 중 오류가 발생했습니다.";
+        function addMessage(message, isUser) {
+            const chatMessages = document.getElementById("chat-messages");
+            const messageContainer = document.createElement("div");
+            // console.log(messageContainer + '1');
+            messageContainer.classList.add("message");
+            messageContainer.classList.add(isUser ? "user-message" : "bot-message");
+            // console.log(messageContainer.classList +'2');
+            messageContainer.textContent = message;
+            // console.log(messageContainer.textContent);
+            chatMessages.appendChild(messageContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the latest message
         }
-    }
 
-    async function sendMessage() {
-        const userMessage = document.getElementById("user-input").value;
-        document.getElementById("user-input").value = "";
-        if (userMessage) {
-            addMessage(userMessage, true);
-            userMs_list.push(userMessage); // 유저 메세지 추가
-
+        // Function to send a message to the server
+        async function sendMessageToServer(message) {
             try {
-                const assistantMessage = await sendMessageToServer(userMessage);
-                addMessage(assistantMessage, false);
-                assistantMs_list.push(assistantMessage);  // 어시스트 메서지 추가
+                const response = await fetch('https://zzy4wztgeyqmj4gujfj652fo4m0wslud.lambda-url.ap-northeast-2.on.aws/fortuneTell', { // Replace with your server's URL
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ 
+                        // message,
+                        // mySeasonLocal : mySeasonLocal,
+                        userMs_list : userMs_list,
+                        assistantMs_list : assistantMs_list,
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById("loading-screen").style.display= "none";
+                console.log(data);
+                return data.assistant;
             } catch (error) {
                 console.error(error);
+                return "운세를 가져오는 중 오류가 발생했습니다.";
             }
-
-            document.getElementById("user-input").value = "";
         }
-    }
-</script>
 
+        async function sendMessage() {
+            const userMessage = document.getElementById("user-input").value;
+            document.getElementById("loading-screen").style.display= "block";
+            document.getElementById("user-input").value = "";
+            if (userMessage) {
+                addMessage(userMessage, true);
+                userMs_list.push(userMessage); // 유저 메세지 추가
 
+                try {
+                    const assistantMessage = await sendMessageToServer(userMessage);
+                    addMessage(assistantMessage, false);
+                    assistantMs_list.push(assistantMessage);  // 어시스트 메서지 추가
+                } catch (error) {
+                    console.error(error);
+                }
 
+                document.getElementById("user-input").value = "";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    </body>
 </html>
